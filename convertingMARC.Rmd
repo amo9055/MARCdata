@@ -1,13 +1,163 @@
 ---
-title: "Converting MARC to CSV Using marc2csv.py"
+title: "MARC for Programming Historians"
 author: "Allison O'Connor"
 date: "November 9, 2014"
 output: html_document
 ---
 
+
+
+##_What is MARC?_
+
+A MARC record is a MAchine Readable Cataloging record, and it uses a standard method of identifying information in a library catalog through tags and indicators. Historians who wish to perform an analysis of books published by a specific publisher, books published in a particular city, books published on a given topic, or other analyses using bibliographic data can all benefit from this conversion tool.
+
+##_Where does MARC come from?_
+
+Many library catalogs will provide an option for downloading MARC records, although you may have to manually select the records for download, unless you find a provider who will allow you to download all of the results from a specific search. Below are a few places to get started looking for MARC data.
+
+George Mason University Libraries Catalog http://magik.gmu.edu/cgi-bin/Pwebrecon.cgi?DB=local&PAGE=First
+
+Harvard Library Bibliographic Data Set http://openmetadata.lib.harvard.edu/bibdata
+
+Library of Congress Online Catalog http://catalog.loc.gov (Information on downloading options available at http://catalog.loc.gov/vwebv/ui/en_US/ht
+docs/help/faqs.html#14 .)
+
+MARC Records from Scriblio 2007 https://archive.org/details/marc_records_scriblio_net
+
+##_How do I read MARC?_
+
+A number of guides and tutorials are available for MARC records. A good overview, available through the Library of Congress is _What Is a MARC Record,
+And Why Is It Important?_ (see http://www.loc.gov/marc/uma/pt1-7.html#pt4 ).
+
+While you are getting used to MARC, it can be helpful to view some records through the library catalog where you intend to get your data; this should allow easy switching between a human-readable catalog record and the machine-readable catalog record. Depending on your historical question, you will want to get acquainted with specific MARC tags and their associated indicators and subfields.
+
+For MARC records, tags are three digit numbers that represent the field for the data. Some examples are:  
+
+* 020 International Standard Book Number -- (ISBN);  
+* 100 Main entry -- Personal name -- (primary author);  
+* 260 Publication, distribution, etc. (Imprint);  
+* 600 Subject added entry -- Personal name; and  
+* 650 Subject added entry -- Topical term.
+
+These tags are grouped into the following categories: 
+* 0XX code and number fields
+* 1XX main entry fields
+* 2XX title and edition fields
+* 3XX physical description fields
+* 4XX series fields
+* 5XX notes fields
+* 6XX subject fields
+* 7XX added entry and linking fields
+* 8XX series added entry and holdings data fields
+* 9XX local data fields
+
+[Taylor, Arlene G. and Joudrey, Daniel N. _The Organization of Information_. 3rd edition, Westport, Conn: Libraries Unlimited. 2009, page 135.]
+
+Up to two indicators---comprised of a single digit number---may be defined for any given field. For example, field 600, which catalogs subject headings comprised of personal names, contains the following indicators:  
+
+
+**Indicator 1: Type of personal name entry element**  
+      0 -- Forename  
+      1 -- Surname (this is the most common form)  
+      3 -- Family name  
+**Indicator 2: Subject heading system/thesaurus** (identifies the specific list or file which was used)
+     0 -- Library of Congress Subject Headings  
+     1 -- LC subject headings for children's literature  
+      2 -- Medical Subject Headings  
+      3 -- National Agricultural Library subject authority file  
+      4 -- Source not specified  
+      5 -- Canadian Subject Headings  
+      6 -- Répertoire de vedettes-matière  
+      7 -- Source specified in subfield $2  
+
+
+The next part of the MARC record is the delimited subfield which contains the information. Most frequently used subfields for the 260 field, for example, include:
+```
+    $a -- Place of publication, distribution, etc.
+    $b -- Name of publisher, distributor, etc.
+    $c -- Date of publication, distribution, etc.
+```
+
+As you find your way around in MARC records, this list of common MARC fields may be helpful, http://www.loc.gov/marc/umb/um07to10.html . If you need help understanding something you find in a record that is not part of the list of common fields, more extensive documentation is available at: http://www.loc.gov/marc/marcdocz.html . For a good overview, see Taylor and Joudrey, referenced above.
+
+##Converting MARC
+
+For many programming techniques used by historians, it is helpful to convert MARC from the native format into a .csv file, so that the comma delimited fields can be manipulated in the programming environment. For this tutorial, the method of converting is to use a script written in python.
+
+##_Getting, Installing, & Running marc2csv.py_
 marc2csv.py is a script written in python which converts downloaded MARC record data into .csv format, which then can be pulled into R for analysis.
 
-A MARC record is a MAchine Readable Cataloging record, and it uses a standard method of identifying information in a library catalog through tags and indicators. Historians who wish to perform an analysis of books published by a specific publisher, books published in a particular city, or books published on a given topic can all benefit from this conversion tool.
+You can get the script at: https://github.com/jindrichmynarz/MARC2CSV and should view the README.md file for the necessary python libraries to install as well. Use the command line to install the python libraries, and to clone the files from github. 
 
-You can get the script at: https://github.com/jindrichmynarz/MARC2CSV and should view the README.md file for the necessary python libraries to install as well. Use the command line to install the python libraries, and to clone the files from github. Be prepared to place MARC2CSV in a folder convenient to where you want to work, and to place a data folder as a subdirectory within MARC2CSV to hold your MARC data files and the converted .csv files.
+```
+$ sudo easy_install chardet
+
+$ sudo easy_install pymarc
+
+$ git clone https://github.com/jindrichmynarz/MARC2CSV.git
+
+```
+_What directory should you clone the files to?_ Make sure that the directory is easy to access from the directory where you will hold your MARC data files that need converting. For example, I placed MARC2CSV in a folder for my programming work, and placed a data folder as a subdirectory within MARC2CSV to hold my MARC data files and the converted .csv files.
+
+If your data file is in a directory in MARC2CSV, your code to convert the file will look like this:
+
+```
+$ ../marc2csv.py records.mrc
+```
+
+Once you have your MARC records converted into a .csv format, and you have identified which fields you are interested in for your analysis, the real fun can begin!
+
+##Playing with Data
+
+But first: the .csv file that comes out of the conversion may not have a header row to identify the columns of data. Before you pull your file into R, it is best to add that information in. In my text editor I added a new row at the top and typed:
+
+```
+Item, Field, x1, x2, x3, x4, x5, Value
+```
+Depending on where you get your MARC data, it may or may not have the same structure. The sample data came from Library of Congress. I did not know exactly which sub-fields or delimiters were assigned to x1-x5, and so kept the names generic.
+
+Load the .csv file into R so that you can access your data.
+```{r}
+marcdata <- read.csv(file = "records.csv", sep = ",", stringsAsFactors = FALSE)
+```
+
+Load any libraries you need for data analysis.
+```{r message=FALSE}
+
+library(mullenMisc)
+library(ggplot2)
+library(stringr)
+library(dplyr)
+```
+
+```{r}
+limited_marcdata <- marcdata %>%
+  select(Item,
+         Field,
+         x4,
+         Value) %>%
+  filter(Field %in% c("260", "300")) %>%
+  filter(x4 == "c")
+
+tbl_df(limited_marcdata)
+
+```
+
+This data is somewhat problematic if we want to plot the publication year, so we need to clean that up.
+
+```{r}
+limited_marcdata <- limited_marcdata %>%
+  mutate(year = str_extract(Value, "\\d{4}"))
+
+tbl_df(limited_marcdata)
+```
+
+Next, let's plot the data.
+
+```{r fig.width = 11}
+ggplot(data = limited_marcdata,
+       aes(x = year))+
+  geom_histogram()+ 
+  theme(axis.text.x=element_text(angle=90, hjust=1))
+```
 
