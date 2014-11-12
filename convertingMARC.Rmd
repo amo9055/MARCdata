@@ -1,0 +1,13 @@
+---
+title: "Converting MARC to CSV Using marc2csv.py"
+author: "Allison O'Connor"
+date: "November 9, 2014"
+output: html_document
+---
+
+marc2csv.py is a script written in python which converts downloaded MARC record data into .csv format, which then can be pulled into R for analysis.
+
+A MARC record is a MAchine Readable Cataloging record, and it uses a standard method of identifying information in a library catalog through tags and indicators. Historians who wish to perform an analysis of books published by a specific publisher, books published in a particular city, or books published on a given topic can all benefit from this conversion tool.
+
+You can get the script at: https://github.com/jindrichmynarz/MARC2CSV and should view the README.md file for the necessary python libraries to install as well. Use the command line to install the python libraries, and to clone the files from github. Be prepared to place MARC2CSV in a folder convenient to where you want to work, and to place a data folder as a subdirectory within MARC2CSV to hold your MARC data files and the converted .csv files.
+
