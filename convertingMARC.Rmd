@@ -6,10 +6,9 @@ output: html_document
 ---
 
 
-
 ##_What is MARC?_
 
-A MARC record is a MAchine Readable Cataloging record, and it uses a standard method of identifying information in a library catalog through tags and indicators. Historians who wish to perform an analysis of books published by a specific publisher, books published in a particular city, books published on a given topic, or other analyses using bibliographic data can all benefit from this conversion tool.
+A MARC record is a MAchine Readable Cataloging record, and it uses a standard method of identifying information in a library catalog through tags and indicators. Historians who wish to perform an analysis of books published by a specific publisher, books published in a particular city, books published on a given topic, or other analyses using bibliographic data can all benefit from pulling MARC data into R for further analysis. This tutorial will show you how to do it, step-by-step.
 
 ##_Where does MARC come from?_
 
@@ -19,8 +18,7 @@ George Mason University Libraries Catalog http://magik.gmu.edu/cgi-bin/Pwebrecon
 
 Harvard Library Bibliographic Data Set http://openmetadata.lib.harvard.edu/bibdata
 
-Library of Congress Online Catalog http://catalog.loc.gov (Information on downloading options available at http://catalog.loc.gov/vwebv/ui/en_US/ht
-docs/help/faqs.html#14 .)
+Library of Congress Online Catalog http://catalog.loc.gov (Information on downloading options available at http://catalog.loc.gov/vwebv/ui/en_US/htdocs/help/faqs.html#14 .)
 
 MARC Records from Scriblio 2007 https://archive.org/details/marc_records_scriblio_net
 
@@ -40,6 +38,7 @@ For MARC records, tags are three digit numbers that represent the field for the 
 * 650 Subject added entry -- Topical term.
 
 These tags are grouped into the following categories: 
+
 * 0XX code and number fields
 * 1XX main entry fields
 * 2XX title and edition fields
@@ -51,24 +50,27 @@ These tags are grouped into the following categories:
 * 8XX series added entry and holdings data fields
 * 9XX local data fields
 
-[Taylor, Arlene G. and Joudrey, Daniel N. _The Organization of Information_. 3rd edition, Westport, Conn: Libraries Unlimited. 2009, page 135.]
+[For more detailed information, see: Taylor, Arlene G. and Joudrey, Daniel N. _The Organization of Information_. 3rd edition, Westport, Conn: Libraries Unlimited. 2009, page 135.]
 
 Up to two indicators---comprised of a single digit number---may be defined for any given field. For example, field 600, which catalogs subject headings comprised of personal names, contains the following indicators:  
 
 
 **Indicator 1: Type of personal name entry element**  
+
       0 -- Forename  
       1 -- Surname (this is the most common form)  
       3 -- Family name  
+      
 **Indicator 2: Subject heading system/thesaurus** (identifies the specific list or file which was used)
+
      0 -- Library of Congress Subject Headings  
      1 -- LC subject headings for children's literature  
-      2 -- Medical Subject Headings  
-      3 -- National Agricultural Library subject authority file  
-      4 -- Source not specified  
-      5 -- Canadian Subject Headings  
-      6 -- Répertoire de vedettes-matière  
-      7 -- Source specified in subfield $2  
+     2 -- Medical Subject Headings  
+     3 -- National Agricultural Library subject authority file  
+     4 -- Source not specified  
+     5 -- Canadian Subject Headings  
+     6 -- Répertoire de vedettes-matière  
+     7 -- Source specified in subfield $2  
 
 
 The next part of the MARC record is the delimited subfield which contains the information. Most frequently used subfields for the 260 field, for example, include:
@@ -80,7 +82,7 @@ The next part of the MARC record is the delimited subfield which contains the in
 
 As you find your way around in MARC records, this list of common MARC fields may be helpful, http://www.loc.gov/marc/umb/um07to10.html . If you need help understanding something you find in a record that is not part of the list of common fields, more extensive documentation is available at: http://www.loc.gov/marc/marcdocz.html . For a good overview, see Taylor and Joudrey, referenced above.
 
-##Converting MARC
+##_Converting MARC_
 
 For many programming techniques used by historians, it is helpful to convert MARC from the native format into a .csv file, so that the comma delimited fields can be manipulated in the programming environment. For this tutorial, the method of converting is to use a script written in python.
 
@@ -102,19 +104,19 @@ _What directory should you clone the files to?_ Make sure that the directory is 
 If your data file is in a directory in MARC2CSV, your code to convert the file will look like this:
 
 ```
-$ ../marc2csv.py records.mrc
+$ ../marc2csv.py records
 ```
 
 Once you have your MARC records converted into a .csv format, and you have identified which fields you are interested in for your analysis, the real fun can begin!
 
-##Playing with Data
+##_Playing with Data_
 
 But first: the .csv file that comes out of the conversion may not have a header row to identify the columns of data. Before you pull your file into R, it is best to add that information in. In my text editor I added a new row at the top and typed:
 
 ```
 Item, Field, x1, x2, x3, x4, x5, Value
 ```
-Depending on where you get your MARC data, it may or may not have the same structure. The sample data came from Library of Congress. I did not know exactly which sub-fields or delimiters were assigned to x1-x5, and so kept the names generic.
+Depending on where you get your MARC data, it may or may not have the same structure. The sample data came from Library of Congress, and is the result of a subject search for "ventilation". I did not know exactly which sub-fields or delimiters were assigned to x1-x5 until I got familiar with the data in an easier-to-read format (after I pulled it into R). So, at this point, I just kept the names generic.
 
 Load the .csv file into R so that you can access your data.
 ```{r}
@@ -130,13 +132,15 @@ library(stringr)
 library(dplyr)
 ```
 
+In this example, I am interested in plotting the publication years associated with records that have the subject heading "Ventilation". Since the records I downloaded from LOC all have "Ventilation" in the subject heading, I just need to limit my MARC data set to find publication years, which is found in MARC field 260$c.
+
 ```{r}
 limited_marcdata <- marcdata %>%
   select(Item,
          Field,
          x4,
          Value) %>%
-  filter(Field %in% c("260", "300")) %>%
+  filter(Field %in% c("260")) %>%
   filter(x4 == "c")
 
 tbl_df(limited_marcdata)
@@ -158,6 +162,12 @@ Next, let's plot the data.
 ggplot(data = limited_marcdata,
        aes(x = year))+
   geom_histogram()+ 
-  theme(axis.text.x=element_text(angle=90, hjust=1))
+  theme(axis.text.x=element_text(angle=90, hjust=1))+
+  ggtitle("Number of Books with Subject Heading 'Ventilation' in LOC by Publication Year")
 ```
 
+We can fine-tune the code to get a better looking plot, but already we can see some trends in the publication dates of books about ventilation. 
+
+The combination of these tools allows us to analyze bibliographic data in new and interesting ways. 
+
+Questions, comments, or feedback? Please contact aoconnor@gmu.edu.
