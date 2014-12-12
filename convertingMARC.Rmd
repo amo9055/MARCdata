@@ -170,4 +170,4 @@ We can fine-tune the code to get a better looking plot, but already we can see s
 
 The combination of these tools allows us to analyze bibliographic data in new and interesting ways. 
 
-Questions, comments, or feedback? Please contact aoconnor@gmu.edu.
+This tutorial created as part of the course "Programming for Historians," taught by [Lincoln Mullen](http://lincolnmullen.com/) at George Maosn University, Fall, 2014. Questions, comments, or feedback? Please contact aoconnor@gmu.edu.
