@@ -99,7 +99,7 @@ $ sudo easy_install pymarc
 $ git clone https://github.com/jindrichmynarz/MARC2CSV.git
 
 ```
-_What directory should you clone the files to?_ Make sure that the directory is easy to access from the directory where you will hold your MARC data files that need converting. For example, I placed MARC2CSV in a folder for my programming work, and placed a data folder as a subdirectory within MARC2CSV to hold my MARC data files and the converted .csv files.
+_What directory should you clone the files to?_ Make sure that the directory is easy to access from the directory where you will hold your MARC data files that need converting. For example, I placed MARC2CSV in a folder for my programming work, and placed a data folder as a subdirectory within MARC2CSV to hold my MARC data files and the converted .csv files. If you would like to download sample data to follow along, you can clone the repository from GitHub at: https://github.com/amo9055/MARCdata.git .
 
 If your data file is in a directory in MARC2CSV, your code to convert the file will look like this:
 
